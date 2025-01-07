@@ -1,11 +1,16 @@
 {
-  "name": "esp-api",
+  "name": "esp-api-proje",
   "version": "1.0.0",
-  "main": "api/data.js",
+  "description": "API untuk Data Laundry",
+  "main": "server.js",
   "scripts": {
-    "start": "node api/data.js"
+    "start": "node server.js"
   },
   "dependencies": {
-    "express": "^4.17.1"
-  }
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "body-parser": "^1.19.0"
+  },
+  "author": "",
+  "license": "ISC"
 }

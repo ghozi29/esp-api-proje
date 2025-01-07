@@ -1,39 +1,62 @@
-// Mengimpor dependensi
-const cors = require('cors');
-
-// Menggunakan express untuk menangani request HTTP
 const express = require('express');
+const cors = require('cors');
 const app = express();
 
-// Middleware untuk memungkinkan CORS
+// Middleware untuk CORS, mengizinkan semua origin
 app.use(cors({
-  origin: '*', // Mengizinkan akses dari semua origin, atau ganti dengan origin spesifik jika dibutuhkan
+  origin: '*', // Anda bisa ganti dengan domain spesifik jika ingin membatasi akses
 }));
 
-// Menangani request JSON
+// Middleware untuk body-parser (membaca request body dalam format JSON)
 app.use(express.json());
 
+// Dummy data yang akan diakses melalui API
 let sensorData = [
   { "id": 1, "nama": "juan", "harga": 20000, "jumlah": 4, "berat": 10, "layanan": "cepat" },
   { "id": 2, "nama": "ana", "harga": 25000, "jumlah": 3, "berat": 5, "layanan": "biasa" }
-  // Data lainnya
+  // Anda bisa menambahkan data lain di sini
 ];
 
-let currentId = 3;
+let currentId = 3; // ID untuk data yang baru
 
-// Endpoint untuk mendapatkan semua data (GET)
+// Endpoint untuk mengambil data (GET)
 app.get('/api/data', (req, res) => {
   res.status(200).json(sensorData);
 });
 
+// Endpoint untuk menambahkan data baru (POST)
+app.post('/api/data', (req, res) => {
+  const { nama, harga, jumlah, berat, layanan } = req.body;
+
+  // Pastikan semua data yang diperlukan ada dan valid
+  if (!nama || !harga || !jumlah || !berat || !layanan) {
+    return res.status(400).json({ message: 'All fields are required' });
+  }
+
+  const newData = {
+    id: currentId++, // Menggunakan ID yang baru
+    nama,
+    harga,
+    jumlah,
+    berat,
+    layanan
+  };
+
+  // Menambahkan data baru ke dalam array
+  sensorData.push(newData);
+
+  // Mengirim response sukses
+  res.status(201).json({ message: 'Data saved successfully!' });
+});
+
 // Endpoint untuk menghapus data berdasarkan ID (DELETE)
 app.delete('/api/data/:id', (req, res) => {
-  const { id } = req.params;
+  const { id } = req.params; // ID yang akan dihapus
 
-  // Mencari data dengan ID yang sesuai
+  // Mencari index data berdasarkan ID
   const index = sensorData.findIndex(item => item.id == id);
   if (index !== -1) {
-    // Menghapus data
+    // Menghapus data dari array
     sensorData.splice(index, 1);
     res.status(200).json({ message: 'Data deleted successfully!' });
   } else {
@@ -41,20 +64,5 @@ app.delete('/api/data/:id', (req, res) => {
   }
 });
 
-// Menangani POST untuk menyimpan data baru
-app.post('/api/data', (req, res) => {
-  const { nama, harga, jumlah, berat, layanan } = req.body;
-  const newData = {
-    id: currentId++,
-    nama,
-    harga,
-    jumlah,
-    berat,
-    layanan
-  };
-  sensorData.push(newData);
-  res.status(201).json({ message: 'Data saved successfully!' });
-});
-
-// Ekspor sebagai handler untuk fungsi serverless di Vercel
+// Export app untuk digunakan oleh Vercel sebagai fungsi serverless
 module.exports = app;

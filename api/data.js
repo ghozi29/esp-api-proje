@@ -1,11 +1,11 @@
 let sensorData = [
   {
-    "id": null,
-    "nama": null,
-    "harga": null,
-    "jumlah": null,
-    "berat": null,
-    "layanan": null
+    "id": 1,
+    "nama": "juan",
+    "harga": 20.000,
+    "jumlah": 4,
+    "berat": 10,
+    "layanan": "cepat"
   }
 ];
 

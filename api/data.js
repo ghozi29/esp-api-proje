@@ -1,8 +1,9 @@
 const express = require('express');
 const app = express();
+const bodyParser = require('body-parser');
+app.use(bodyParser.json()); // Parsing JSON request bodies
 
-// Middleware untuk mengurai JSON
-app.use(express.json());
+// API logic here
 
 // Data awal yang akan di-manage oleh API
 let sensorData = [

@@ -1,12 +1,3 @@
-const cors = require('cors');
-const express = require('express');
-const app = express();
-
-// Menambahkan middleware CORS
-app.use(cors({
-  origin: '*', // Anda dapat mengganti '*' dengan domain spesifik jika ingin membatasi akses
-}));
-
 let sensorData = [
   {
     "id": 1,
@@ -16,17 +7,21 @@ let sensorData = [
     "berat": 10,
     "layanan": "cepat"
   },
-  // Data lainnya
+  // Anda dapat menambahkan lebih banyak data di sini jika diperlukan
 ];
 
-let currentId = 2;
+let currentId = 2;  // ID berikutnya yang akan digunakan
 
+// Menangani permintaan GET dan POST
 module.exports = (req, res) => {
   if (req.method === 'GET') {
-    res.status(200).json(sensorData);  // Mengirimkan data dalam format JSON
+    // Mengirimkan data dalam format JSON saat permintaan GET
+    res.status(200).json(sensorData);
   } else if (req.method === 'POST') {
-    // Menyimpan data baru jika ada request POST
+    // Menyimpan data baru yang dikirimkan melalui POST request
     const { nama, harga, jumlah, berat, layanan } = req.body;
+
+    // Membuat objek data baru dengan ID baru
     const newData = {
       id: currentId,
       nama,
@@ -35,10 +30,15 @@ module.exports = (req, res) => {
       berat,
       layanan
     };
+
+    // Menambahkan data baru ke dalam array sensorData
     sensorData.push(newData);
-    currentId++;
+    currentId++;  // Menambahkan ID untuk data berikutnya
+
+    // Mengirimkan respons status 201 (Created)
     res.status(201).json({ message: 'Data saved successfully!' });
   } else {
+    // Mengirimkan status 405 jika metode selain GET atau POST digunakan
     res.status(405).json({ message: 'Method not allowed' });
   }
 };

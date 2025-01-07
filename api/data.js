@@ -1,47 +1,42 @@
-let sensorData = {
-  nama: null,
-  harga: null,
-  jumlah: null,
-  berat: null,
-  layanan: null
-};
+let sensorData = [
+  {
+    "id": null,
+    "nama": null,
+    "harga": null,
+    "jumlah": null,
+    "berat": null,
+    "layanan": null
+  }
+];
+
+let currentId = 2;  // ID berikutnya yang akan digunakan
 
 module.exports = (req, res) => {
   if (req.method === 'GET') {
-    // Mengirimkan data terbaru saat ada permintaan GET
+    // Mengirimkan data dalam format array saat ada permintaan GET
     res.status(200).json(sensorData);
   } else if (req.method === 'POST') {
-    // Menyimpan data dari ESP yang dikirim via POST
+    // Menyimpan data baru dengan ID yang baru
     const { nama, harga, jumlah, berat, layanan } = req.body;
-    sensorData = { nama, harga, jumlah, berat, layanan };
+
+    // Membuat objek data baru dengan ID yang baru
+    const newData = {
+      id: currentId,
+      nama,
+      harga,
+      jumlah,
+      berat,
+      layanan
+    };
+
+    // Menambahkan data baru ke dalam array
+    sensorData.push(newData);
+
+    // Menambahkan ID untuk entri berikutnya
+    currentId++;
+
     res.status(200).json({ message: 'Data saved successfully!' });
   } else {
     res.status(405).json({ message: 'Method not allowed' });
   }
 };
-
-/*const admin = require('firebase-admin');
-admin.initializeApp();
-
-const db = admin.database();
-const ref = db.ref("sensorData");
-
-app.post('/api/data', (req, res) => {
-  const data = req.body;
-  
-  // Menambahkan data baru ke database dengan timestamp
-  const newData = ref.push(); // Menggunakan push() untuk menambah data baru
-  newData.set({
-    suhu: data.suhu,
-    kelembapan: data.kelembapan,
-    tinggi: data.tinggi,
-    timestamp: Date.now()
-  })
-  .then(() => {
-    res.status(200).send('Data saved successfully!');
-  })
-  .catch((error) => {
-    res.status(500).send('Error saving data: ' + error.message);
-  });
-});*/
-

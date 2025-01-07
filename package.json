@@ -1,16 +1,17 @@
 {
   "name": "esp-api-proje",
   "version": "1.0.0",
-  "description": "API untuk Data Laundry",
-  "main": "server.js",
+  "description": "API untuk Data Laundry menggunakan Vercel",
+  "main": "api/data.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "vercel dev"
   },
   "dependencies": {
-    "express": "^4.18.2",
-    "cors": "^2.8.5",
-    "body-parser": "^1.19.0"
+    "cors": "^2.8.5"
   },
-  "author": "",
+  "devDependencies": {},
+  "engines": {
+    "node": "16.x"
+  },
   "license": "ISC"
 }

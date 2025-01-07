@@ -1,68 +1,89 @@
+// data.js (Backend API handler for GET, PUT, DELETE)
 const express = require('express');
-const cors = require('cors');
 const app = express();
 
-// Middleware untuk CORS, mengizinkan semua origin
-app.use(cors({
-  origin: '*', // Anda bisa ganti dengan domain spesifik jika ingin membatasi akses
-}));
-
-// Middleware untuk body-parser (membaca request body dalam format JSON)
-app.use(express.json());
-
-// Dummy data yang akan diakses melalui API
+// Sample data (usually this data would be in a database)
 let sensorData = [
-  { "id": 1, "nama": "juan", "harga": 20000, "jumlah": 4, "berat": 10, "layanan": "cepat" },
-  { "id": 2, "nama": "ana", "harga": 25000, "jumlah": 3, "berat": 5, "layanan": "biasa" }
-  // Anda bisa menambahkan data lain di sini
+    {
+        "id": 1,
+        "nama": "juan",
+        "harga": 20000,
+        "jumlah": 4,
+        "berat": 10,
+        "layanan": "cepat"
+    },
+    {
+        "id": 2,
+        "nama": "Anna",
+        "harga": 30000,
+        "jumlah": 5,
+        "berat": 15,
+        "layanan": "standar"
+    }
 ];
 
-let currentId = 3; // ID untuk data yang baru
+let currentId = 3;
 
-// Endpoint untuk mengambil data (GET)
+// Middleware to handle JSON requests
+app.use(express.json());  // Parse JSON request body
+
+// Route to GET all data
 app.get('/api/data', (req, res) => {
-  res.status(200).json(sensorData);
+    res.status(200).json(sensorData);  // Return all sensorData
 });
 
-// Endpoint untuk menambahkan data baru (POST)
-app.post('/api/data', (req, res) => {
-  const { nama, harga, jumlah, berat, layanan } = req.body;
-
-  // Pastikan semua data yang diperlukan ada dan valid
-  if (!nama || !harga || !jumlah || !berat || !layanan) {
-    return res.status(400).json({ message: 'All fields are required' });
-  }
-
-  const newData = {
-    id: currentId++, // Menggunakan ID yang baru
-    nama,
-    harga,
-    jumlah,
-    berat,
-    layanan
-  };
-
-  // Menambahkan data baru ke dalam array
-  sensorData.push(newData);
-
-  // Mengirim response sukses
-  res.status(201).json({ message: 'Data saved successfully!' });
+// Route to GET specific data by ID
+app.get('/api/data/:id', (req, res) => {
+    const { id } = req.params;
+    const item = sensorData.find(data => data.id === parseInt(id));
+    
+    if (item) {
+        res.status(200).json(item);  // If found, return the data
+    } else {
+        res.status(404).json({ message: 'Data not found' });  // If not found
+    }
 });
 
-// Endpoint untuk menghapus data berdasarkan ID (DELETE)
+// Route to PUT (update) existing data by ID
+app.put('/api/data/:id', (req, res) => {
+    const { id } = req.params;
+    const { nama, harga, jumlah, berat, layanan } = req.body;
+    
+    const index = sensorData.findIndex(item => item.id === parseInt(id));
+
+    if (index !== -1) {
+        // Update the item
+        sensorData[index] = {
+            id: parseInt(id),
+            nama,
+            harga,
+            jumlah,
+            berat,
+            layanan
+        };
+
+        res.status(200).json({ message: 'Data updated successfully' });
+    } else {
+        res.status(404).json({ message: 'Data not found' });
+    }
+});
+
+// Route to DELETE data by ID
 app.delete('/api/data/:id', (req, res) => {
-  const { id } = req.params; // ID yang akan dihapus
+    const { id } = req.params;
+    const index = sensorData.findIndex(item => item.id === parseInt(id));
 
-  // Mencari index data berdasarkan ID
-  const index = sensorData.findIndex(item => item.id == id);
-  if (index !== -1) {
-    // Menghapus data dari array
-    sensorData.splice(index, 1);
-    res.status(200).json({ message: 'Data deleted successfully!' });
-  } else {
-    res.status(404).json({ message: 'Data not found' });
-  }
+    if (index !== -1) {
+        // Remove the item from the array
+        sensorData.splice(index, 1);
+        res.status(200).json({ message: 'Data deleted successfully' });
+    } else {
+        res.status(404).json({ message: 'Data not found' });
+    }
 });
 
-// Export app untuk digunakan oleh Vercel sebagai fungsi serverless
-module.exports = app;
+// Set the port (necessary for deployment on Vercel)
+app.listen(3000, () => {
+    console.log('Server running on port 3000');
+});
+

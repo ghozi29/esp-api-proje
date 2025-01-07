@@ -1,0 +1,11 @@
+{
+  "name": "esp-api",
+  "version": "1.0.0",
+  "main": "api/data.js",
+  "scripts": {
+    "start": "node api/data.js"
+  },
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}

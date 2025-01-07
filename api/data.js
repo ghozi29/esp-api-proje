@@ -1,12 +1,9 @@
-// api/data.js
-const cors = require('cors');
+const express = require('express');
+const app = express();
 
-// Gunakan cors agar bisa mengakses API dari domain lain
-const corsHandler = cors({
-  origin: '*', // Anda bisa mengganti '*' dengan domain yang lebih spesifik
-  methods: ['GET', 'POST']
-});
+app.use(express.json());  // Untuk parsing JSON
 
+// Data contoh yang akan dioperasikan
 let sensorData = [
   {
     "id": 1,
@@ -16,36 +13,32 @@ let sensorData = [
     "berat": 10,
     "layanan": "cepat"
   },
-  // Data lainnya...
+  // Data lainnya
 ];
 
 let currentId = 2;
 
-// Fungsi utama yang menangani request
-module.exports = (req, res) => {
-  // Menambahkan CORS middleware
-  corsHandler(req, res, () => {
-    if (req.method === 'GET') {
-      res.status(200).json(sensorData); // Mengirimkan data
-    } else if (req.method === 'POST') {
-      // Menambahkan data baru
-      const { nama, harga, jumlah, berat, layanan } = req.body;
+// Endpoint untuk mendapatkan semua data
+app.get('/api/data', (req, res) => {
+  res.status(200).json(sensorData);
+});
 
-      // Validasi data
-      const newData = {
-        id: currentId,
-        nama,
-        harga,
-        jumlah,
-        berat,
-        layanan
-      };
-      sensorData.push(newData);
-      currentId++;
+// Endpoint untuk menghapus data berdasarkan ID
+app.delete('/api/data/:id', (req, res) => {
+  const { id } = req.params;
 
-      res.status(201).json({ message: 'Data saved successfully!' });
-    } else {
-      res.status(405).json({ message: 'Method not allowed' });
-    }
-  });
-};
+  // Cari data dengan ID yang cocok
+  const index = sensorData.findIndex(item => item.id == id);
+  if (index !== -1) {
+    // Hapus data dari array
+    sensorData.splice(index, 1);
+    res.status(200).json({ message: 'Data deleted successfully!' });
+  } else {
+    res.status(404).json({ message: 'Data not found' });
+  }
+});
+
+// Menjalankan server pada port 3000
+app.listen(3000, () => {
+  console.log('Server running on port 3000');
+});

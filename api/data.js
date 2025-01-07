@@ -1,3 +1,10 @@
+const express = require('express');
+const app = express();
+
+// Middleware untuk mengurai JSON
+app.use(express.json());
+
+// Data awal yang akan di-manage oleh API
 let sensorData = [
   {
     "id": 1,
@@ -11,43 +18,51 @@ let sensorData = [
 
 let currentId = 2;  // ID berikutnya yang akan digunakan
 
-module.exports = (req, res) => {
-  if (req.method === 'GET') {
-    // Mengirimkan data dalam format array saat ada permintaan GET
-    res.status(200).json(sensorData);
-  } else if (req.method === 'POST') {
-    // Menyimpan data baru dengan ID yang baru
-    const { nama, harga, jumlah, berat, layanan } = req.body;
+// Menghandle GET request untuk mengambil data
+app.get('/api/data', (req, res) => {
+  res.status(200).json(sensorData);
+});
 
-    // Pastikan input berupa angka yang valid
-    const parsedHarga = parseFloat(harga);
-    const parsedJumlah = parseInt(jumlah);
-    const parsedBerat = parseFloat(berat);
+// Menghandle POST request untuk menambahkan data baru
+app.post('/api/data', (req, res) => {
+  const { nama, harga, jumlah, berat, layanan } = req.body;
 
-    // Validasi input
-    if (isNaN(parsedHarga) || isNaN(parsedJumlah) || isNaN(parsedBerat)) {
-      return res.status(400).json({ message: 'Invalid data format' });
-    }
+  // Pastikan input berupa angka yang valid
+  const parsedHarga = parseFloat(harga);
+  const parsedJumlah = parseInt(jumlah);
+  const parsedBerat = parseFloat(berat);
 
-    // Membuat objek data baru dengan ID yang baru
-    const newData = {
-      id: currentId,
-      nama,
-      harga: parsedHarga,
-      jumlah: parsedJumlah,
-      berat: parsedBerat,
-      layanan
-    };
-
-    // Menambahkan data baru ke dalam array
-    sensorData.push(newData);
-
-    // Menambahkan ID untuk entri berikutnya
-    currentId++;
-
-    // Mengirimkan status sukses dengan status code 201
-    res.status(201).json({ message: 'Data saved successfully!' });
-  } else {
-    res.status(405).json({ message: 'Method not allowed' });
+  // Validasi input
+  if (isNaN(parsedHarga) || isNaN(parsedJumlah) || isNaN(parsedBerat)) {
+    return res.status(400).json({ message: 'Invalid data format' });
   }
-};
+
+  // Membuat objek data baru dengan ID yang baru
+  const newData = {
+    id: currentId,
+    nama,
+    harga: parsedHarga,
+    jumlah: parsedJumlah,
+    berat: parsedBerat,
+    layanan
+  };
+
+  // Menambahkan data baru ke dalam array
+  sensorData.push(newData);
+
+  // Menambahkan ID untuk entri berikutnya
+  currentId++;
+
+  // Mengirimkan status sukses dengan status code 201
+  res.status(201).json({ message: 'Data saved successfully!' });
+});
+
+// Menangani jika ada method yang tidak diizinkan
+app.all('*', (req, res) => {
+  res.status(405).json({ message: 'Method not allowed' });
+});
+
+// Menjalankan server
+app.listen(3000, () => {
+  console.log('Server running on port 3000');
+});

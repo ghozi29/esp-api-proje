@@ -1,16 +1,3 @@
-const express = require('express');
-const cors = require('cors');
-const app = express();
-
-// Middleware for CORS
-app.use(cors({
-  origin: '*'
-}));
-
-// Middleware to parse JSON request bodies
-app.use(express.json());
-
-// Sample data (gunakan "tanggal", bukan "Tanggal")
 let sensorData = [
   { id: 1, nama: "juan", harga: 20000, jumlah: 4, berat: 10, layanan: "cepat", tanggal: "2025-06-07" },
   { id: 2, nama: "ana", harga: 25000, jumlah: 3, berat: 5, layanan: "biasa", tanggal: "2025-06-07" }
@@ -18,45 +5,50 @@ let sensorData = [
 
 let currentId = 3;
 
-// GET: Retrieve all data
-app.get('/api/data', (req, res) => {
-  res.status(200).json(sensorData);
-});
+module.exports = (req, res) => {
+  const { method, url } = req;
 
-// POST: Add new data
-app.post('/api/data', (req, res) => {
-  const { nama, harga, jumlah, berat, layanan, tanggal } = req.body;
+  // Extract ID from URL like /api/data/2
+  const match = url.match(/\/api\/data\/(\d+)/);
+  const id = match ? parseInt(match[1]) : null;
 
-  if (!nama || !harga || !jumlah || !berat || !layanan || !tanggal) {
-    return res.status(400).json({ message: 'All fields are required' });
+  if (method === 'GET') {
+    res.status(200).json(sensorData);
   }
 
-  const newData = {
-    id: currentId++,
-    nama,
-    harga,
-    jumlah,
-    berat,
-    layanan,
-    tanggal  // gunakan "tanggal" lowercase
-  };
+  else if (method === 'POST') {
+    let body = '';
+    req.on('data', chunk => (body += chunk));
+    req.on('end', () => {
+      const { nama, harga, jumlah, berat, layanan, tanggal } = JSON.parse(body);
+      if (!nama || !harga || !jumlah || !berat || !layanan || !tanggal) {
+        return res.status(400).json({ message: 'All fields are required' });
+      }
 
-  sensorData.push(newData);
-  res.status(201).json({ message: 'Data saved successfully!', data: newData });
-});
-
-// DELETE: Delete data by ID
-app.delete('/api/data/:id', (req, res) => {
-  const { id } = req.params;
-  const index = sensorData.findIndex(item => item.id == id);
-
-  if (index !== -1) {
-    sensorData.splice(index, 1);
-    res.status(200).json({ message: 'Data deleted successfully!' });
-  } else {
-    res.status(404).json({ message: 'Data not found' });
+      const newData = { id: currentId++, nama, harga, jumlah, berat, layanan, tanggal };
+      sensorData.push(newData);
+      res.status(201).json({ message: 'Data saved', data: newData });
+    });
   }
-});
 
-// Export the app for Vercel
-module.exports = app;
+  else if (method === 'DELETE' && id) {
+    const index = sensorData.findIndex(item => item.id === id);
+    if (index !== -1) {
+      sensorData.splice(index, 1);
+      res.status(200).json({ message: 'Data deleted' });
+    } else {
+      res.status(404).json({ message: 'Data not found' });
+    }
+  }
+
+  else if (method === 'OPTIONS') {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET,POST,DELETE,OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    res.status(204).end();
+  }
+
+  else {
+    res.status(405).json({ message: 'Method not allowed' });
+  }
+};

@@ -73,6 +73,7 @@
         <thead>
             <tr>
                 <th>No</th>
+                <th>tanggal</th>
                 <th>Nama</th>
                 <th>Harga</th>
                 <th>Jumlah</th>
@@ -109,6 +110,7 @@ $(document).ready(function() {
                             <td>${item.jumlah || 'N/A'}</td>
                             <td>${item.berat || 'N/A'}</td>
                             <td>${item.layanan || 'N/A'}</td>
+                            <td>${item.tanggal || 'N/A'}</td>
                             <td><button class="delete-button" data-id="${item.id}">Delete</button></td>
                         </tr>
                     `;

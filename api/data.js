@@ -12,8 +12,8 @@ app.use(express.json());
 
 // Sample data
 let sensorData = [
-  { "id": 1, "nama": "juan", "harga": 20000, "jumlah": 4, "berat": 10, "layanan": "cepat" },
-  { "id": 2, "nama": "ana", "harga": 25000, "jumlah": 3, "berat": 5, "layanan": "biasa" }
+  { "id": 1, "nama": "juan", "harga": 20000, "jumlah": 4, "berat": 10, "layanan": "cepat", "Tanggal": "2025-06-07" },
+  { "id": 2, "nama": "ana", "harga": 25000, "jumlah": 3, "berat": 5, "layanan": "biasa", "Tanggal": "2025-06-07" }
 ];
 
 let currentId = 3;
@@ -25,8 +25,8 @@ app.get('/api/data', (req, res) => {
 
 // POST: Add new data
 app.post('/api/data', (req, res) => {
-  const { nama, harga, jumlah, berat, layanan } = req.body;
-  if (!nama || !harga || !jumlah || !berat || !layanan) {
+  const { nama, harga, jumlah, berat, layanan, tanggal } = req.body;
+  if (!nama || !harga || !jumlah || !berat || !layanan || !tanggal) {
     return res.status(400).json({ message: 'All fields are required' });
   }
 
@@ -36,7 +36,8 @@ app.post('/api/data', (req, res) => {
     harga,
     jumlah,
     berat,
-    layanan
+    layanan,
+    tanggal
   };
 
   sensorData.push(newData);

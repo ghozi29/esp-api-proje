@@ -7,13 +7,7 @@
     }
   ],
   "routes": [
-    {
-      "src": "/api/data",
-      "dest": "/api/data.js"
-    },
-    {
-      "src": "/api/data/:id",
-      "dest": "/api/data.js"
-    }
+    { "src": "/api/data", "dest": "/api/data.js" },
+    { "src": "/api/data/(.*)", "dest": "/api/data.js" }
   ]
 }

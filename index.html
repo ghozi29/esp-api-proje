@@ -73,7 +73,7 @@
         <thead>
             <tr>
                 <th>No</th>
-                <th>tanggal</th>
+                <th>Tanggal</th>
                 <th>Nama</th>
                 <th>Harga</th>
                 <th>Jumlah</th>
@@ -92,7 +92,7 @@
 
 <script>
 $(document).ready(function() {
-    const apiURL = "https://esp-api-proje.vercel.app/api/data"; // Your API endpoint
+    const apiURL = "https://esp-api-proje.vercel.app/api/data"; // API endpoint
 
     // Function to load data from the API and display it in the table
     function loadData() {
@@ -105,46 +105,46 @@ $(document).ready(function() {
                     const row = `
                         <tr>
                             <td>${index + 1}</td>
-                            <td>${item.nama || 'N/A'}</td>
-                            <td>${item.harga || 'N/A'}</td>
-                            <td>${item.jumlah || 'N/A'}</td>
-                            <td>${item.berat || 'N/A'}</td>
-                            <td>${item.layanan || 'N/A'}</td>
                             <td>${item.tanggal || 'N/A'}</td>
+                            <td>${item.nama || 'N/A'}</td>
+                            <td>Rp ${item.harga?.toLocaleString() || 'N/A'}</td>
+                            <td>${item.jumlah || 'N/A'}</td>
+                            <td>${item.berat || 'N/A'} kg</td>
+                            <td>${item.layanan || 'N/A'}</td>
                             <td><button class="delete-button" data-id="${item.id}">Delete</button></td>
                         </tr>
                     `;
                     tableBody.append(row);
                 });
             } else {
-                tableBody.append('<tr><td colspan="7">No data available</td></tr>');
+                tableBody.append('<tr><td colspan="8">No data available</td></tr>');
             }
         }).fail(function(xhr, status, error) {
-            console.error('Error loading data:', error);  // Log error for debugging
+            console.error('Error loading data:', error);
+            $('#error-message').show();
         });
     }
 
     // Event listener for delete button click
     $('#laundryTable').on('click', '.delete-button', function() {
-        const id = $(this).data('id'); // Get the ID of the item to delete
-        const row = $(this).closest('tr'); // Find the row of the button clicked
+        const id = $(this).data('id');
+        const row = $(this).closest('tr');
 
-        // Make DELETE request to the API
         $.ajax({
-            url: `${apiURL}/${id}`,  // API endpoint to delete data
+            url: `${apiURL}/${id}`,
             method: 'DELETE',
             success: function(response) {
                 console.log('Data deleted:', response);
-                row.remove();  // Remove the row from the table on success
+                row.remove();
             },
             error: function(xhr, status, error) {
-                console.error('Failed to delete data:', error);  // Log error for debugging
-                $('#error-message').show();  // Show error message to the user
+                console.error('Failed to delete data:', error);
+                $('#error-message').show();
             }
         });
     });
 
-    // Load data when the page is ready
+    // Initial load
     loadData();
 });
 </script>

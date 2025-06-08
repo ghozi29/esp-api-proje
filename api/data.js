@@ -19,8 +19,9 @@ router.get('/', (req, res) => {
 
 // POST new
 router.post('/', (req, res) => {
-  const { nama, harga, jumlah, berat, layanan, tanggal } = req.body;
-  if (!nama || !harga || !jumlah || !berat || !layanan || !tanggal) {
+  const { nama, harga, jumlah, berat, layanan, tanggal, tanggalPengambilan, code } = req.body;
+
+  if (!nama || !harga || !jumlah || !berat || !layanan || !tanggal || !tanggalPengambilan || !code) {
     return res.status(400).json({ message: 'All fields are required' });
   }
 
@@ -39,6 +40,7 @@ router.post('/', (req, res) => {
   sensorData.push(newData);
   res.status(201).json({ message: 'Data saved successfully!', data: newData });
 });
+
 
 // DELETE by ID
 router.delete('/:id', (req, res) => {

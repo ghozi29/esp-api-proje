@@ -1,8 +1,12 @@
 {
-  "name": "my-laundry-app",
+  "name": "laundry-api",
   "version": "1.0.0",
+  "main": "api/data.js",
+  "license": "MIT",
   "dependencies": {
-    "express": "^4.17.1",
-    "cors": "^2.8.5"
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "mongoose": "^7.3.4",
+    "serverless-http": "^3.0.0"
   }
 }

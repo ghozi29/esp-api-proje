@@ -1,28 +1,31 @@
 const mongoose = require('mongoose');
 
 const MONGO_URI = process.env.MONGO_URI;
+if (!MONGO_URI) throw new Error('MONGO_URI not set in environment');
 
 let cached = global.mongoose;
 if (!cached) {
   cached = global.mongoose = { conn: null, promise: null };
 }
 
-async function dbConnect() {
+async function connectDB() {
   if (cached.conn) return cached.conn;
 
   if (!cached.promise) {
     cached.promise = mongoose.connect(MONGO_URI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true
-    }).then((mongoose) => mongoose);
+      bufferCommands: false
+    }).then(m => {
+      console.log('✅ MongoDB connected');
+      return m;
+    });
   }
 
   cached.conn = await cached.promise;
   return cached.conn;
 }
 
-// Schema
-const sensorSchema = new mongoose.Schema({
+// Define Schema
+const SensorSchema = new mongoose.Schema({
   nama: String,
   harga: Number,
   jumlah: Number,
@@ -31,11 +34,11 @@ const sensorSchema = new mongoose.Schema({
   tanggal: String
 }, { timestamps: true });
 
-const Sensor = mongoose.models.Sensor || mongoose.model('Sensor', sensorSchema);
+const Sensor = mongoose.models.Sensor || mongoose.model('Sensor', SensorSchema);
 
-// Fungsi handler API
+// API Handler
 module.exports = async (req, res) => {
-  await dbConnect();
+  await connectDB();
 
   if (req.method === 'GET') {
     const data = await Sensor.find().sort({ createdAt: -1 });
@@ -45,20 +48,18 @@ module.exports = async (req, res) => {
   if (req.method === 'POST') {
     const { nama, harga, jumlah, berat, layanan, tanggal } = req.body;
     if (!nama || !harga || !jumlah || !berat || !layanan || !tanggal) {
-      return res.status(400).json({ message: 'Semua field harus diisi' });
+      return res.status(400).json({ message: 'Semua field wajib diisi' });
     }
-
-    const newData = await Sensor.create({ nama, harga, jumlah, berat, layanan, tanggal });
-    return res.status(201).json({ message: 'Berhasil disimpan', data: newData });
+    const created = await Sensor.create({ nama, harga, jumlah, berat, layanan, tanggal });
+    return res.status(201).json(created);
   }
 
   if (req.method === 'DELETE') {
     const { id } = req.query;
     const deleted = await Sensor.findByIdAndDelete(id);
     if (!deleted) return res.status(404).json({ message: 'Data tidak ditemukan' });
-
-    return res.status(200).json({ message: 'Data berhasil dihapus' });
+    return res.status(200).json({ message: 'Berhasil dihapus' });
   }
 
-  res.status(405).json({ message: 'Method tidak didukung' });
+  return res.status(405).json({ message: 'Method tidak didukung' });
 };

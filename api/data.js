@@ -1,16 +1,15 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const serverless = require('serverless-http');
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 
-// MongoDB URI dari Environment Variable VERCEL
 const MONGO_URI = process.env.MONGO_URI;
 
-// Connect MongoDB (harus cek koneksi sekali saja)
 let conn = null;
 async function connectToDatabase() {
   if (conn) return conn;
@@ -18,7 +17,6 @@ async function connectToDatabase() {
   return conn;
 }
 
-// Schema dan model
 const sensorSchema = new mongoose.Schema({
   nama: String,
   harga: Number,
@@ -30,14 +28,13 @@ const sensorSchema = new mongoose.Schema({
 
 const Sensor = mongoose.models.Sensor || mongoose.model('Sensor', sensorSchema);
 
-// Router
-app.get('/api/data', async (req, res) => {
+app.get('/', async (req, res) => {
   await connectToDatabase();
   const data = await Sensor.find().sort({ createdAt: -1 });
   res.json(data);
 });
 
-app.post('/api/data', async (req, res) => {
+app.post('/', async (req, res) => {
   await connectToDatabase();
   const { nama, harga, jumlah, berat, layanan, tanggal } = req.body;
   if (!nama || !harga || !jumlah || !berat || !layanan || !tanggal) {
@@ -48,7 +45,7 @@ app.post('/api/data', async (req, res) => {
   res.status(201).json({ message: 'Data berhasil disimpan!', data: newData });
 });
 
-app.delete('/api/data/:id', async (req, res) => {
+app.delete('/:id', async (req, res) => {
   await connectToDatabase();
   const { id } = req.params;
   const deleted = await Sensor.findByIdAndDelete(id);
@@ -59,5 +56,4 @@ app.delete('/api/data/:id', async (req, res) => {
   }
 });
 
-// Export sebagai handler Vercel
-module.exports = app;
+module.exports.handler = serverless(app);

@@ -9,8 +9,11 @@
   "routes": [
     {
       "src": "/api/data",
-      "methods": ["GET", "POST", "DELETE"],
-      "dest": "api/data.js"
+      "dest": "/api/data.js"
+    },
+    {
+      "src": "/api/data/(.*)",
+      "dest": "/api/data.js"
     }
   ]
 }

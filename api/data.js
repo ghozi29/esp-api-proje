@@ -13,7 +13,10 @@ const MONGO_URI = process.env.MONGO_URI;
 let conn = null;
 async function connectToDatabase() {
   if (conn) return conn;
-  conn = await mongoose.connect(MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true });
+  conn = await mongoose.connect(MONGO_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  });
   return conn;
 }
 
@@ -23,15 +26,27 @@ const sensorSchema = new mongoose.Schema({
   jumlah: Number,
   berat: Number,
   layanan: String,
-  tanggal: String
+  tanggal: String,
 }, { timestamps: true });
 
 const Sensor = mongoose.models.Sensor || mongoose.model('Sensor', sensorSchema);
 
+// NOTE: Vercel API routes prefix with /api/data so in Express use '/'
+
 app.get('/', async (req, res) => {
   await connectToDatabase();
   const data = await Sensor.find().sort({ createdAt: -1 });
-  res.json(data);
+  // Kirimkan id dari _id supaya frontend bisa akses
+  const dataWithId = data.map(item => ({
+    id: item._id.toString(),
+    tanggal: item.tanggal,
+    nama: item.nama,
+    harga: item.harga,
+    jumlah: item.jumlah,
+    berat: item.berat,
+    layanan: item.layanan,
+  }));
+  res.json(dataWithId);
 });
 
 app.post('/', async (req, res) => {
@@ -42,7 +57,10 @@ app.post('/', async (req, res) => {
   }
   const newData = new Sensor({ nama, harga, jumlah, berat, layanan, tanggal });
   await newData.save();
-  res.status(201).json({ message: 'Data berhasil disimpan!', data: newData });
+  res.status(201).json({ message: 'Data berhasil disimpan!', data: {
+    id: newData._id.toString(),
+    nama, harga, jumlah, berat, layanan, tanggal
+  }});
 });
 
 app.delete('/:id', async (req, res) => {

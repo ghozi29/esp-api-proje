@@ -1,65 +1,57 @@
-const mongoose = require('mongoose');
+const express = require('express');
+const app = express();
+const router = express.Router();
+const cors = require('cors');
 
-const MONGO_URI = process.env.MONGO_URI;
-if (!MONGO_URI) throw new Error('MONGO_URI not set in environment');
+app.use(cors({ origin: '*' }));
+app.use(express.json());
 
-let cached = global.mongoose;
-if (!cached) {
-  cached = global.mongoose = { conn: null, promise: null };
-}
+let sensorData = [
+  { id: 1, nama: "juan", harga: 20000, jumlah: 4, berat: 10, layanan: "cepat", tanggal: "2025-06-07" },
+  { id: 2, nama: "ana", harga: 25000, jumlah: 3, berat: 5, layanan: "biasa", tanggal: "2025-06-07" }
+];
+let currentId = 3;
 
-async function connectDB() {
-  if (cached.conn) return cached.conn;
+// GET all
+router.get('/', (req, res) => {
+  res.json(sensorData);
+});
 
-  if (!cached.promise) {
-    cached.promise = mongoose.connect(MONGO_URI, {
-      bufferCommands: false
-    }).then(m => {
-      console.log('✅ MongoDB connected');
-      return m;
-    });
+// POST new
+router.post('/', (req, res) => {
+  const { nama, harga, jumlah, berat, layanan, tanggal } = req.body;
+  if (!nama || !harga || !jumlah || !berat || !layanan || !tanggal) {
+    return res.status(400).json({ message: 'All fields are required' });
   }
 
-  cached.conn = await cached.promise;
-  return cached.conn;
-}
+  const newData = {
+    id: currentId++,
+    nama,
+    harga,
+    jumlah,
+    berat,
+    layanan,
+    tanggal
+  };
 
-// Define Schema
-const SensorSchema = new mongoose.Schema({
-  nama: String,
-  harga: Number,
-  jumlah: Number,
-  berat: Number,
-  layanan: String,
-  tanggal: String
-}, { timestamps: true });
+  sensorData.push(newData);
+  res.status(201).json({ message: 'Data saved successfully!', data: newData });
+});
 
-const Sensor = mongoose.models.Sensor || mongoose.model('Sensor', SensorSchema);
+// DELETE by ID
+router.delete('/:id', (req, res) => {
+  const { id } = req.params;
+  const index = sensorData.findIndex(item => item.id == id);
 
-// API Handler
-module.exports = async (req, res) => {
-  await connectDB();
-
-  if (req.method === 'GET') {
-    const data = await Sensor.find().sort({ createdAt: -1 });
-    return res.status(200).json(data);
+  if (index !== -1) {
+    sensorData.splice(index, 1);
+    res.status(200).json({ message: 'Data deleted successfully!' });
+  } else {
+    res.status(404).json({ message: 'Data not found' });
   }
+});
 
-  if (req.method === 'POST') {
-    const { nama, harga, jumlah, berat, layanan, tanggal } = req.body;
-    if (!nama || !harga || !jumlah || !berat || !layanan || !tanggal) {
-      return res.status(400).json({ message: 'Semua field wajib diisi' });
-    }
-    const created = await Sensor.create({ nama, harga, jumlah, berat, layanan, tanggal });
-    return res.status(201).json(created);
-  }
+// Attach router
+app.use('/api/data', router);
 
-  if (req.method === 'DELETE') {
-    const { id } = req.query;
-    const deleted = await Sensor.findByIdAndDelete(id);
-    if (!deleted) return res.status(404).json({ message: 'Data tidak ditemukan' });
-    return res.status(200).json({ message: 'Berhasil dihapus' });
-  }
-
-  return res.status(405).json({ message: 'Method tidak didukung' });
-};
+module.exports = app;

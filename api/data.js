@@ -21,7 +21,7 @@ router.get('/', (req, res) => {
 router.post('/', (req, res) => {
   const { nama, harga, jumlah, berat, layanan, tanggal, tanggalPengambilan, code } = req.body;
 
-  if (!nama || !harga || !jumlah || !berat || !layanan || !tanggal || !tanggalPengambilan || !code) {
+  if (!nama || !harga || !jumlah || !berat || !layanan || !tanggal ) {
     return res.status(400).json({ message: 'All fields are required' });
   }
 

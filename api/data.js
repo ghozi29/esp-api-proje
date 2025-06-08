@@ -7,8 +7,8 @@ app.use(cors({ origin: '*' }));
 app.use(express.json());
 
 let sensorData = [
-  { id: 1, nama: "juan", harga: 20000, jumlah: 4, berat: 10, layanan: "cepat", tanggal: "2025-06-07" },
-  { id: 2, nama: "ana", harga: 25000, jumlah: 3, berat: 5, layanan: "biasa", tanggal: "2025-06-07" }
+  { id: 1, nama: "juan", harga: 10000, jumlah: 4, berat: 0.93, layanan: "cepat", tanggal: "2025-06-07" },
+  { id: 2, nama: "jovan", harga: 10000, jumlah: 3, berat: 0.86, layanan: "biasa", tanggal: "2025-06-07" }
 ];
 let currentId = 3;
 

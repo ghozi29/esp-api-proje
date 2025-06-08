@@ -1,57 +1,57 @@
 const express = require('express');
-const app = express();
 const router = express.Router();
-const cors = require('cors');
+const mongoose = require('mongoose');
 
-app.use(cors({ origin: '*' }));
-app.use(express.json());
+// Definisi schema & model langsung di sini supaya simpel
+const sensorSchema = new mongoose.Schema({
+  nama: String,
+  harga: Number,
+  jumlah: Number,
+  berat: Number,
+  layanan: String,
+  tanggal: String
+}, { timestamps: true });
 
-let sensorData = [
-  { id: 1, nama: "juan", harga: 20000, jumlah: 4, berat: 10, layanan: "cepat", tanggal: "2025-06-07" },
-  { id: 2, nama: "ana", harga: 25000, jumlah: 3, berat: 5, layanan: "biasa", tanggal: "2025-06-07" }
-];
-let currentId = 3;
+const Sensor = mongoose.model('Sensor', sensorSchema);
 
-// GET all
-router.get('/', (req, res) => {
-  res.json(sensorData);
+// GET semua data
+router.get('/', async (req, res) => {
+  try {
+    const data = await Sensor.find().sort({ createdAt: -1 });
+    res.json(data);
+  } catch (err) {
+    res.status(500).json({ message: 'Error mengambil data' });
+  }
 });
 
-// POST new
-router.post('/', (req, res) => {
+// POST data baru
+router.post('/', async (req, res) => {
   const { nama, harga, jumlah, berat, layanan, tanggal } = req.body;
   if (!nama || !harga || !jumlah || !berat || !layanan || !tanggal) {
-    return res.status(400).json({ message: 'All fields are required' });
+    return res.status(400).json({ message: 'Semua field wajib diisi' });
   }
 
-  const newData = {
-    id: currentId++,
-    nama,
-    harga,
-    jumlah,
-    berat,
-    layanan,
-    tanggal
-  };
-
-  sensorData.push(newData);
-  res.status(201).json({ message: 'Data saved successfully!', data: newData });
-});
-
-// DELETE by ID
-router.delete('/:id', (req, res) => {
-  const { id } = req.params;
-  const index = sensorData.findIndex(item => item.id == id);
-
-  if (index !== -1) {
-    sensorData.splice(index, 1);
-    res.status(200).json({ message: 'Data deleted successfully!' });
-  } else {
-    res.status(404).json({ message: 'Data not found' });
+  try {
+    const newData = new Sensor({ nama, harga, jumlah, berat, layanan, tanggal });
+    await newData.save();
+    res.status(201).json({ message: 'Data berhasil disimpan!', data: newData });
+  } catch (err) {
+    res.status(500).json({ message: 'Gagal menyimpan data' });
   }
 });
 
-// Attach router
-app.use('/api/data', router);
+// DELETE data berdasarkan ID
+router.delete('/:id', async (req, res) => {
+  try {
+    const deleted = await Sensor.findByIdAndDelete(req.params.id);
+    if (deleted) {
+      res.json({ message: 'Data berhasil dihapus!' });
+    } else {
+      res.status(404).json({ message: 'Data tidak ditemukan' });
+    }
+  } catch (err) {
+    res.status(500).json({ message: 'Error menghapus data' });
+  }
+});
 
-module.exports = app;
+module.exports = router;

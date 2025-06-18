@@ -8,7 +8,15 @@ app.use(express.json());
 
 let sensorData = [
   { id: 1, nama: "juan", harga: 10000, jumlah: 4, berat: 0.93, layanan: "cepat", tanggal: "2025-06-07", tanggalPengambilan: "2025-06-08", code: "231242" },
-  { id: 2, nama: "jovan", harga: 10000, jumlah: 3, berat: 0.86, layanan: "biasa", tanggal: "2025-06-07", tanggalPengambilan: "2025-06-12", code: "167812" }
+  { id: 2, nama: "jovan", harga: 7000, jumlah: 3, berat: 0.86, layanan: "biasa", tanggal: "2025-06-07", tanggalPengambilan: "2025-06-12", code: "167812" },
+  { id: 3, nama: "jordi", harga: 7000, jumlah: 2, berat: 0.56, layanan: "biasa", tanggal: "2025-06-18", tanggalPengambilan: "2025-06-23", code: "123691" },
+  { id: 4, nama: "harja", harga: 7000, jumlah: 6, berat: 0.98, layanan: "biasa", tanggal: "2025-06-18", tanggalPengambilan: "2025-06-23", code: "523923" },
+   { id: 5, nama: "robert", harga: 7000, jumlah: 2, berat: 0.56, layanan: "biasa", tanggal: "2025-06-18", tanggalPengambilan: "2025-06-23", code: "763261" },
+  { id: 6, nama: "hezekia", harga: 10000, jumlah: 6, berat: 0.98, layanan: "cepat", tanggal: "2025-06-18", tanggalPengambilan: "2025-06-19", code: "752410" },
+  { id: 7, nama: "rania", harga: 9900, jumlah: 8, berat: 1.10, layanan: "sedang", tanggal: "2025-06-18", tanggalPengambilan: "2025-06-21", code: "286521" },
+  { id: 8, nama: "burhan", harga: 10000, jumlah: 5, berat: 0.88, layanan: "cepat", tanggal: "2025-06-18", tanggalPengambilan: "2025-06-19", code: "528901" },
+   { id: 9, nama: "kaesang", harga: 14040, jumlah: 12, berat: 1.56, layanan: "sedang", tanggal: "2025-06-18", tanggalPengambilan: "2025-06-21", code: "165290" },
+  { id: 10, nama: "marlong", harga: 19800, jumlah: 17, berat: 2.20, layanan: "sedang", tanggal: "2025-06-18", tanggalPengambilan: "2025-06-21", code: "308615" },
 ];
 let currentId = 3;
 
